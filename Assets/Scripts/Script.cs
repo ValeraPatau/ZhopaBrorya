@@ -1,29 +1,34 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Script : MonoBehaviour
+[RequireComponent(typeof(Rigidbody2D))]
+//назови нормально скрипт
+public sealed class Script : MonoBehaviour
 {
-    public Rigidbody2D rb;
-    public float HorizontalMove = 0f;
+    private Rigidbody2D rb;
+    [SerializeField] private float HorizontalMove = 0f;
 
     [Header("Player move settings")]
-    [Range(0, 10f)] public float speed = 1f;
-    [Range(0, 15f)] public float jumpforce = 5f;
+    [SerializeField] private float speed = 1f;
+    [SerializeField] private float jumpforce = 5f;
 
     [Space]
     [Header("Ground Checking settings")]
-    public bool isOnGround = false;
-    [Range(-5f, 5f)]public float checkGroundOffsetY = -1.8f;
-    [Range(0, 5f)]public float checkGroundRadius = 0.3f;
-
-
-
+    private bool isOnGround = false;
+    [SerializeField] private float checkGroundOffsetY = -1.8f;
+    [Range(0, 5f), SerializeField] private float checkGroundRadius = 0.3f;
+    
     private bool facingrotate = true;
-    void Start()
-    {
+    
+    private void Awake(){
         rb = GetComponent<Rigidbody2D>();
     }
+    
+    private void OnValidate(){
+        speed = Mathf.Clamp(speed, 0, float.MaxValue);
+        jumpforce = Mathf.Clamp(jumpforce, 0, float.MaxValue);
+    }
+    
     void Update()
     {
         HorizontalMove = Input.GetAxisRaw("Horizontal") * speed;
@@ -46,8 +51,10 @@ public class Script : MonoBehaviour
     public Vector2 moveVector;
     void FixedUpdate()
     {
+        //откуда 2
         moveVector = new Vector2(HorizontalMove * 2f, rb.velocity.y);
         rb.velocity = moveVector;
+        //очень дорого рекомендую переделать при проверки КОЛЛИЗИИ
         CheckGround();
     }
 
@@ -55,6 +62,7 @@ public class Script : MonoBehaviour
     {
         facingrotate = !facingrotate;
         Vector3 scale = transform.localScale;
+        //не рекомендую так делать потому что все дочерние объекты такой же скейл получат
         scale.x *= -1;
         transform.localScale = scale;
     }
@@ -72,4 +80,6 @@ public class Script : MonoBehaviour
             isOnGround = false;
         }
     }
+    
+    public bool IsOnGround => isOnGround;
 }
