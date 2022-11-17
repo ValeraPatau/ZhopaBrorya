@@ -34,11 +34,11 @@ public sealed class MobScript : MonoBehaviour
 
         void StartHunting()
         {
-            if (transform.position.x < _player.position.x)
+            if (_cached.position.x < _player.position.x)
             {
                 _rigidbody2D.velocity = new Vector2(_speed, 0);
             }
-            else if (transform.position.x > _player.position.x)
+            else if (_cached.position.x > _player.position.x)
             {
                 _rigidbody2D.velocity = new Vector2(-_speed, 0);
             }
