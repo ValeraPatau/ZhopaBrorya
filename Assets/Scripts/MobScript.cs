@@ -1,23 +1,29 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class MobScript : MonoBehaviour
+[RequireComponent(typeof(Rigidbody2D))]
+public sealed class MobScript : MonoBehaviour
 {
-    public Rigidbody2D physic;
-    public Transform player;
-    public float speed = 5f;
-    public float agroDist;
-    void Start()
+    [SerializeField] private Rigidbody2D _rigidbody2D;
+    [SerializeField] private Transform _player;
+    [SerializeField] private float _speed = 5f;
+    [SerializeField] private float _agressivnessDistance;
+    private Transform _cached;
+
+    private void Start()
     {
-        physic = GetComponent<Rigidbody2D>();
+        _cached = transform;
+        _rigidbody2D = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+	private void OnValidate()
+	{
+        _speed = Mathf.Clamp(_speed, 0, float.MaxValue);
+	}
+
+	private void FixedUpdate()
     {
-        float distToPlayer = Vector2.Distance(transform.position, player.position);
-        if (distToPlayer < agroDist)
+        float distToPlayer = (_player.position - _cached.position).sqrMagnitude;
+        if (distToPlayer < _agressivnessDistance * _agressivnessDistance)
         {
             StartHunting();
         }
@@ -28,19 +34,19 @@ public class MobScript : MonoBehaviour
 
         void StartHunting()
         {
-            if (transform.position.x < player.position.x)
+            if (_cached.position.x < _player.position.x)
             {
-                physic.velocity = new Vector2(speed, 0);
+                _rigidbody2D.velocity = new Vector2(_speed, 0);
             }
-            else if (transform.position.x > player.position.x)
+            else if (_cached.position.x > _player.position.x)
             {
-                physic.velocity = new Vector2(-speed, 0);
+                _rigidbody2D.velocity = new Vector2(-_speed, 0);
             }
         }
 
         void StopHunting()
         {
-            physic.velocity = new Vector2(0, 0);
+            _rigidbody2D.velocity = new Vector2(0, 0);
         }
     }
 
