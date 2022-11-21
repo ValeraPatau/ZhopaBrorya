@@ -10,7 +10,7 @@ public class PlayerScript : MonoBehaviour
 
     [Header("Player move settings")]
     [Range(0, 10f)] public float speed = 1f;
-    [Range(0, 1080f)] public float jumpforce = 5f;
+    
     
 
 
@@ -57,17 +57,26 @@ public class PlayerScript : MonoBehaviour
     }
 
     
+    public float jumpForce = 210f;
+    private bool jumpControl;
+    private float jumpIteration = 0;
+    public float jumpValueIteration = 60;
     void Jump()
     {
-        if (isOnGround && Input.GetKeyDown(KeyCode.W) && isOnGround )
+        if (Input.GetKey(KeyCode.Space))
         {
-            rb.AddForce(Vector2.up * jumpforce, ForceMode2D.Impulse);
-        }
-        if  (Input.GetKeyUp(KeyCode.W) && rb.velocity.y > 0)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, 5);
-        }
+            if (isOnGround) { jumpControl = true; }
 
+        }      
+        else { jumpControl = false; }
+        if (jumpControl)
+        {
+            if (jumpIteration++ < jumpValueIteration)
+            {
+            rb.AddForce(Vector2.up * jumpForce / jumpIteration);
+            }
+        }
+        else { jumpIteration = 0; }
     }
 
     void CheckGround()
