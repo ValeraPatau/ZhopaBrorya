@@ -8,10 +8,14 @@ public class MobScript : MonoBehaviour
     public Transform player;
     public float speed = 5f;
     public float agroDist;
+    public int maxHealth = 100;
+    int currentHealth;
     void Start()
     {
         physic = GetComponent<Rigidbody2D>();
+        currentHealth = maxHealth;
     }
+    
 
     // Update is called once per frame
     void FixedUpdate()
@@ -42,6 +46,23 @@ public class MobScript : MonoBehaviour
         {
             physic.velocity = new Vector2(0, 0);
         }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        if (currentHealth <= 0)
+        {
+            die();
+        }
+
+    }
+
+    void die()
+    {
+        GetComponent<Collider2D>().enabled = false;
+        this.enabled = false;
+        GetComponent<SpriteRenderer>().enabled = false;
     }
 
 }

@@ -11,8 +11,9 @@ public class PlayerScript : MonoBehaviour
     [Header("Player move settings")]
     [Range(0, 10f)] public float speed = 1f;
     
+    public Animator animator;
     
-
+    
 
     [Space]
     [Header("Ground Checking settings")]
@@ -26,23 +27,33 @@ public class PlayerScript : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
     }
+
+    private void Update() 
+    {
+       animator.SetFloat("Speed", Mathf.Abs(HorizontalMove));
+    }
     
-    void Update()
+    void FixedUpdate()
     {
         Walk();
         flip();
-        
+        Jump();
         CheckGround();
+        
+        
+        
     }
 
-    void FixedUpdate()
-    {
-        Jump();
-    }
+    
+    
+    
+
+    
 
     void Walk()
     {
         moveVector.x = Input.GetAxisRaw("Horizontal");
+        HorizontalMove = Input.GetAxisRaw("Horizontal");
 
         rb.velocity = new Vector2(moveVector.x * speed, rb.velocity.y);
     }
@@ -57,6 +68,8 @@ public class PlayerScript : MonoBehaviour
     }
 
     
+
+    
     public float jumpForce = 210f;
     private bool jumpControl;
     private float jumpIteration = 0;
@@ -66,7 +79,7 @@ public class PlayerScript : MonoBehaviour
         if (Input.GetKey(KeyCode.Space))
         {
             if (isOnGround) { jumpControl = true; }
-
+            animator.SetBool("isJumping", true);
         }      
         else { jumpControl = false; }
         if (jumpControl)
@@ -79,17 +92,22 @@ public class PlayerScript : MonoBehaviour
         else { jumpIteration = 0; }
     }
 
-    void CheckGround()
+    public void CheckGround()
     {
         Collider2D[] colliders = Physics2D.OverlapCircleAll(new Vector2(transform.position.x, transform.position.y + checkGroundOffsetY), checkGroundRadius);
 
         if (colliders.Length > 1)
         {
             isOnGround = true;
+            animator.SetBool("isJumping", false);
         }
         else
         {
             isOnGround = false;
         }
+    
+    
+
     }
+    
 }
